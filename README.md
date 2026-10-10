@@ -24,6 +24,9 @@ StudyFlow is a self-designed and developed Django web application. I created the
    `python manage.py runserver`
 
 Open `http://127.0.0.1:8000` in your browser.
+**Designed and developed independently by me.**
+- 🔗 [Case Study Presentation](https://docs.google.com/presentation/d/1QBilkCGGl8JzIEojPYzKgXCQwfOTgnKm/edit?usp=sharing&ouid=113219155399318941852&rtpof=true&sd=true)
+- 🔗 [Live Portfolio](https://zeelspatel-design.netlify.app)
 
 ## Project Goal
 To design and develop a user-friendly task management application that helps users organize tasks and improve productivity.
