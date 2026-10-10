@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create account — StudyFlow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'studyflow/css/style.css' %}">
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="card auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#EEEDFE" stroke-width="2" stroke-linecap="round">
+          <rect x="2" y="4" width="5" height="14" rx="1.5"/>
+          <rect x="9.5" y="2" width="5" height="16" rx="1.5"/>
+          <rect x="17" y="7" width="5" height="11" rx="1.5"/>
+          <path d="M2 22 Q12 18 24 22"/>
+        </svg>
+      </div>
+      <h1 class="auth-title">Create account</h1>
+      <p class="auth-sub">Start your study journey today</p>
+    </div>
+
+    {% if error %}
+    <div class="error-msg mb-4">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" class="auth-form">
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label" for="username">Username</label>
+        <input class="form-input" type="text" id="username" name="username" placeholder="choose a username" required autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <input class="form-input" type="email" id="email" name="email" placeholder="student@email.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input class="form-input" type="password" id="password" name="password" placeholder="create a password" required autocomplete="new-password">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Create account</button>
+    </form>
+
+    <p class="auth-link mt-4">Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
+  </div>
+</div>
+</body>
+</html>

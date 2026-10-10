@@ -1,0 +1,52 @@
+{% extends 'studyflow/base.html' %}
+{% block title %}New Task — StudyFlow{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">New task</h1>
+    <p class="page-sub">Add a study task with deadline and priority</p>
+  </div>
+  <a href="{% url 'dashboard' %}" class="btn btn-outline btn-sm">← Back</a>
+</div>
+
+<div class="card" style="max-width: 520px;">
+  <form method="POST" style="display:flex;flex-direction:column;gap:18px;">
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label class="form-label" for="subject">Subject / Task name</label>
+      <input class="form-input" type="text" id="subject" name="subject" placeholder="e.g. Microcontroller Lab Report" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="description">Description <span class="text-muted">(optional)</span></label>
+      <textarea class="form-input" id="description" name="description" placeholder="Add notes or details…"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="deadline">Deadline</label>
+      <input class="form-input" type="datetime-local" id="deadline" name="deadline" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Priority</label>
+      <div class="priority-group">
+        <input type="radio" class="priority-option" name="priority" id="p-low" value="low">
+        <label class="priority-label pl-low" for="p-low">Low</label>
+
+        <input type="radio" class="priority-option" name="priority" id="p-med" value="medium" checked>
+        <label class="priority-label pl-med" for="p-med">Medium</label>
+
+        <input type="radio" class="priority-option" name="priority" id="p-high" value="high">
+        <label class="priority-label pl-high" for="p-high">High</label>
+      </div>
+    </div>
+
+    <div class="flex gap-3 mt-2">
+      <button type="submit" class="btn btn-primary">Add task</button>
+      <a href="{% url 'dashboard' %}" class="btn btn-outline">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

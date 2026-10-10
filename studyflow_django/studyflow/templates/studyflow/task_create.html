@@ -1,0 +1,65 @@
+{% extends 'studyflow/base.html' %}
+{% block title %}New Task — StudyFlow{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Create New Task</h1>
+    <p class="page-sub">Break down your goals into manageable steps.</p>
+  </div>
+  <a href="{% url 'dashboard' %}" class="btn btn-outline btn-sm">← Back</a>
+</div>
+
+<div class="card" style="max-width:540px;">
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group">
+      <label class="form-label">Task Name</label>
+      <input class="form-input" type="text" name="subject" placeholder="e.g., Complete Calculus Assignment" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Subject</label>
+      <input class="form-input" type="text" name="description" placeholder="e.g., Mathematics, Physics, History...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Deadline</label>
+      <input class="form-input" type="datetime-local" name="deadline" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Priority</label>
+      <div class="prio-group">
+        <input type="radio" class="prio-opt" name="priority" id="p-low"  value="low">
+        <label class="prio-lbl" for="p-low">Low</label>
+        <input type="radio" class="prio-opt" name="priority" id="p-med"  value="medium" checked>
+        <label class="prio-lbl" for="p-med">Medium</label>
+        <input type="radio" class="prio-opt" name="priority" id="p-high" value="high">
+        <label class="prio-lbl" for="p-high">High</label>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Upload your file <span style="font-weight:400;color:#94a3b8;">(optional)</span></label>
+      <label class="upload-box" for="file-input">
+        <input type="file" id="file-input" name="file" style="display:none;" onchange="showFileName(this)">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <div id="upload-text" style="font-size:13px;font-weight:600;color:#3b82f6;margin-top:7px;">Tap to upload</div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:3px;">PDF, DOC, PNG, JPG supported</div>
+      </label>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button type="submit" class="btn btn-primary">Add Task</button>
+      <a href="{% url 'dashboard' %}" class="btn btn-outline">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showFileName(input) {
+  if (input.files[0]) {
+    document.getElementById('upload-text').textContent = '✓ ' + input.files[0].name;
+    document.getElementById('upload-text').style.color = '#22c55e';
+  }
+}
+</script>
+{% endblock %}

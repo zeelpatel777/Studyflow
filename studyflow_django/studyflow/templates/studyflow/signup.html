@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account — StudyFlow</title>
+  <link rel="stylesheet" href="{% static 'studyflow/css/style.css' %}">
+</head>
+<body>
+<div class="auth-wrap">
+  <div style="width:100%;max-width:420px;padding:24px;">
+    <div class="auth-logo">
+      <div class="logo-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="5" height="13" rx="1.5"/><rect x="9" y="2" width="5" height="16" rx="1.5"/><rect x="16" y="7" width="5" height="11" rx="1.5"/><path d="M2 22 Q12 18 22 22"/></svg></div>
+      <div><div class="logo-text" style="font-size:22px;">Study<span>Flow</span></div><div class="logo-tagline">PLAN · FOCUS · ACHIEVE</div></div>
+    </div>
+    <div class="auth-box">
+      <h2 class="auth-title">Create account</h2>
+      <p class="auth-sub">Start your study journey today</p>
+      {% if error %}<div class="error-box" style="margin-top:12px;">{{ error }}</div>{% endif %}
+      <form method="POST" style="margin-top:16px;">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <input class="form-input" type="text" name="username" placeholder="Choose a username" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input class="form-input" type="email" name="email" placeholder="student@email.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" type="password" name="password" placeholder="Min 6 characters" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;font-size:15px;padding:14px;">Create Account</button>
+      </form>
+    </div>
+    <p class="auth-link">Already have an account? <a href="{% url 'login' %}">Sign In</a></p>
+  </div>
+</div>
+</body>
+</html>

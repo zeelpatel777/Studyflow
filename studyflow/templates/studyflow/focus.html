@@ -1,0 +1,152 @@
+{% extends 'studyflow/base.html' %}
+{% block title %}Focus Mode — StudyFlow{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Focus Mode 🎯</h1>
+    <p class="page-sub">Pomodoro timer — stay in the zone</p>
+  </div>
+  <span class="pill pill-purple" id="session-label">Session 1</span>
+</div>
+
+<div class="card" style="max-width:420px;margin:0 auto;text-align:center;">
+  <!-- Timer ring -->
+  <div class="timer-ring" id="timer-ring">
+    <div class="timer-time" id="timer-display">25:00</div>
+    <div class="timer-label" id="timer-sub">remaining</div>
+  </div>
+
+  <!-- Controls -->
+  <div class="timer-controls">
+    <button class="ctrl-btn" onclick="resetTimer()" title="Reset">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+        <path d="M3 3v5h5"/>
+      </svg>
+    </button>
+    <button class="ctrl-btn main" id="play-btn" onclick="toggleTimer()">
+      <svg id="play-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <polygon points="5 3 19 12 5 21 5 3"/>
+      </svg>
+    </button>
+    <button class="ctrl-btn" onclick="skipSession()" title="Skip">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Mode selector -->
+  <div style="display:flex;gap:8px;justify-content:center;margin-top:20px;">
+    <button class="pill pill-purple" id="btn-work" onclick="setMode('work')" style="cursor:pointer;border:none;font-size:12px;padding:6px 14px;">Work 25m</button>
+    <button class="pill" id="btn-short" onclick="setMode('short')" style="cursor:pointer;border:none;background:var(--bg);color:var(--text-secondary);font-size:12px;padding:6px 14px;border-radius:20px;">Break 5m</button>
+    <button class="pill" id="btn-long" onclick="setMode('long')" style="cursor:pointer;border:none;background:var(--bg);color:var(--text-secondary);font-size:12px;padding:6px 14px;border-radius:20px;">Long 15m</button>
+  </div>
+
+  <!-- Quote -->
+  <div class="quote-box mt-4" style="text-align:left;">
+    <p class="quote-text" id="quote-text">"The secret of getting ahead is getting started."</p>
+    <p class="quote-author" id="quote-author">— Mark Twain</p>
+  </div>
+
+  <!-- Streak -->
+  <div style="display:flex;align-items:center;gap:10px;margin-top:16px;background:var(--warn-bg);border-radius:var(--radius-sm);padding:10px 14px;">
+    <span style="font-size:20px;">🔥</span>
+    <div style="flex:1;text-align:left;">
+      <p style="font-size:13px;font-weight:500;color:var(--warn);">{{ profile.streak }}-day streak</p>
+      <p style="font-size:11px;color:var(--warn-bg2,#8A5200);">Keep it going!</p>
+    </div>
+    <span class="pill" style="background:var(--success-bg);color:var(--success);">on track</span>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const QUOTES = [
+  {text: '"The secret of getting ahead is getting started."', author: '— Mark Twain'},
+  {text: '"Success is the sum of small efforts repeated day in and day out."', author: '— Robert Collier'},
+  {text: '"Believe you can and you\'re halfway there."', author: '— Theodore Roosevelt'},
+  {text: '"It always seems impossible until it\'s done."', author: '— Nelson Mandela'},
+  {text: '"Focus on being productive instead of busy."', author: '— Tim Ferriss'},
+];
+
+const MODES = { work: 25*60, short: 5*60, long: 15*60 };
+
+let timeLeft = MODES.work;
+let running = false;
+let interval = null;
+let session = 1;
+let mode = 'work';
+let elapsed = 0;
+
+function fmt(s) {
+  const m = Math.floor(s / 60);
+  return `${String(m).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+}
+
+function updateDisplay() {
+  document.getElementById('timer-display').textContent = fmt(timeLeft);
+}
+
+function setMode(m) {
+  clearInterval(interval); running = false;
+  mode = m; timeLeft = MODES[m];
+  document.getElementById('timer-sub').textContent = m === 'work' ? 'remaining' : 'break';
+  updatePlayIcon();
+  updateDisplay();
+  ['work','short','long'].forEach(k => {
+    const b = document.getElementById('btn-' + k);
+    if (k === m) { b.className = 'pill pill-purple'; b.style.cssText = 'cursor:pointer;border:none;font-size:12px;padding:6px 14px;'; }
+    else { b.className = 'pill'; b.style.cssText = 'cursor:pointer;border:none;background:var(--bg);color:var(--text-secondary);font-size:12px;padding:6px 14px;border-radius:20px;'; }
+  });
+}
+
+function toggleTimer() {
+  if (running) {
+    clearInterval(interval); running = false;
+  } else {
+    running = true;
+    interval = setInterval(() => {
+      if (timeLeft <= 0) {
+        clearInterval(interval); running = false;
+        if (mode === 'work') { saveSession(25); session++; document.getElementById('session-label').textContent = 'Session ' + session; }
+        randomQuote();
+        alert(mode === 'work' ? '✅ Focus session done! Take a break.' : '⚡ Break over — back to work!');
+        setMode(mode === 'work' ? 'short' : 'work');
+        return;
+      }
+      timeLeft--;
+      if (mode === 'work') elapsed++;
+      updateDisplay();
+    }, 1000);
+  }
+  updatePlayIcon();
+}
+
+function updatePlayIcon() {
+  document.getElementById('play-icon').innerHTML = running
+    ? '<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>'
+    : '<polygon points="5 3 19 12 5 21 5 3"/>';
+}
+
+function resetTimer() { clearInterval(interval); running = false; timeLeft = MODES[mode]; elapsed = 0; updateDisplay(); updatePlayIcon(); }
+
+function skipSession() { clearInterval(interval); running = false; if (mode === 'work' && elapsed > 0) saveSession(Math.round(elapsed/60)); setMode(mode === 'work' ? 'short' : 'work'); }
+
+function randomQuote() {
+  const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+  document.getElementById('quote-text').textContent = q.text;
+  document.getElementById('quote-author').textContent = q.author;
+}
+
+function saveSession(minutes) {
+  fetch("{% url 'save_session' %}", {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}'},
+    body: JSON.stringify({ minutes })
+  });
+}
+</script>
+{% endblock %}
