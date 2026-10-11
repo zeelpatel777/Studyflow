@@ -72,3 +72,7 @@ STORAGES = {
 LOGIN_URL          = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+import os
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
