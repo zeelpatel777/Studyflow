@@ -1,0 +1,109 @@
+{% extends 'studyflow/base.html' %}
+{% block title %}Dashboard — StudyFlow{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Good morning, {{ request.user.username }} 👋</h1>
+    <p class="page-sub">{{ all_tasks.count }} pending task{{ all_tasks.count|pluralize }}</p>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center;">
+    <div style="background:#fef3c7;border-radius:12px;padding:8px 14px;display:flex;align-items:center;gap:6px;">
+      <span>🔥</span><span style="font-size:15px;font-weight:700;color:#92400e;">{{ profile.streak }}</span><span style="font-size:11px;color:#92400e;">streak</span>
+    </div>
+    <a href="{% url 'task_create' %}" class="btn btn-primary btn-sm">+ Add Task</a>
+  </div>
+</div>
+
+<!-- Focus Goal Card -->
+<div class="card" style="text-align:center;">
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:5px;">Daily Focus Goal</h3>
+  <p style="font-size:13px;color:#64748b;margin-bottom:14px;">{{ focus_pct }}% of daily goal completed. Keep going!</p>
+  <a href="{% url 'focus' %}" style="display:inline-flex;align-items:center;gap:6px;background:#dcfce7;color:#166534;border:none;border-radius:30px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;margin-bottom:18px;">▶ Resume Session</a>
+  <div class="focus-ring-wrap">
+    <svg class="ring-svg" width="120" height="120" viewBox="0 0 120 120">
+      <circle class="ring-bg" cx="60" cy="60" r="45"/>
+      <circle class="ring-fill" cx="60" cy="60" r="45" style="stroke-dashoffset:{{ 283|add:'-'|add:focus_pct|floatformat:0 }};"/>
+    </svg>
+    <div class="ring-inner">
+      <div class="ring-pct">{{ focus_pct }}%</div>
+      <div class="ring-sub">{{ focus_hrs }}h / 8h</div>
+    </div>
+  </div>
+</div>
+
+<!-- Progress Card -->
+<div class="card">
+  <div class="sec-header">
+    <span class="sec-title">Today's Progress</span>
+    <span class="pill pill-blue">{{ done }} / {{ total }} done</span>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-fill" style="width:{{ progress }}%;"></div>
+  </div>
+  <p style="font-size:12px;color:#64748b;margin-top:8px;">{{ progress }}% complete — keep it up!</p>
+</div>
+
+<!-- All Tasks -->
+<div class="card">
+  <div class="sec-header">
+    <span class="sec-title">All Tasks</span>
+    <span class="pill pill-blue">{{ all_tasks.count }} pending</span>
+  </div>
+  {% if all_tasks %}
+    {% for task in all_tasks %}
+    <div class="task-item">
+      <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+        {% if task.priority == 'high' %}background:#fee2e2;{% elif task.priority == 'medium' %}background:#fef3c7;{% else %}background:#dcfce7;{% endif %}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{% if task.priority == 'high' %}#ef4444{% elif task.priority == 'medium' %}#f59e0b{% else %}#22c55e{% endif %}" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div class="task-name">{{ task.subject }}</div>
+        <div class="task-due">Due {{ task.deadline|date:"D, M j — g:i A" }}</div>
+      </div>
+      <span class="pill {% if task.priority == 'high' %}pill-red{% elif task.priority == 'medium' %}pill-amber{% else %}pill-green{% endif %}">
+        {{ task.get_priority_display }}
+      </span>
+      <div class="task-actions">
+        <form method="POST" action="{% url 'task_complete' task.pk %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-success btn-sm" title="Mark done">✓</button>
+        </form>
+        <form method="POST" action="{% url 'task_delete' task.pk %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger btn-sm" title="Delete">✕</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div style="text-align:center;padding:32px 0;">
+      <p style="font-size:32px;">🎉</p>
+      <p style="font-size:15px;font-weight:600;margin-top:8px;">All done!</p>
+      <p style="font-size:13px;color:#64748b;margin-top:4px;">No pending tasks. Add a new one.</p>
+      <a href="{% url 'task_create' %}" class="btn btn-primary btn-sm" style="display:inline-flex;margin-top:14px;">+ Add Task</a>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Upcoming Deadlines -->
+{% if upcoming %}
+<p style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:12px;">Upcoming Deadlines</p>
+<div class="card">
+  {% for task in upcoming %}
+  <div class="up-item">
+    <div class="up-banner" style="background:{% cycle 'linear-gradient(135deg,#dbeafe,#bfdbfe)' 'linear-gradient(135deg,#dcfce7,#bbf7d0)' 'linear-gradient(135deg,#fef3c7,#fde68a)' 'linear-gradient(135deg,#ede9fe,#ddd6fe)' %};">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    </div>
+    <div class="up-meta">
+      <div class="up-name">{{ task.subject }}</div>
+      <div class="up-days" style="color:#3b82f6;">{{ task.deadline|timeuntil }}</div>
+    </div>
+    <div class="up-desc">{{ task.description|truncatechars:60 }}</div>
+    <div class="up-bar"><div class="up-fill" style="width:20%;background:#3b82f6;"></div></div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

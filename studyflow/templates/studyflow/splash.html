@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyFlow — Plan · Focus · Achieve</title>
+  <link rel="stylesheet" href="{% static 'studyflow/css/style.css' %}">
+</head>
+<body>
+<div class="auth-wrap" style="flex-direction:column;gap:28px;padding:40px 24px;">
+  <div style="text-align:center;">
+    <div style="width:72px;height:72px;background:linear-gradient(135deg,#4f46e5,#3b82f6);border-radius:22px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 8px 32px rgba(79,70,229,.3);">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
+        <rect x="2" y="5" width="5" height="13" rx="1.5"/>
+        <rect x="9" y="2" width="5" height="16" rx="1.5"/>
+        <rect x="16" y="7" width="5" height="11" rx="1.5"/>
+        <path d="M2 22 Q12 18 22 22"/>
+      </svg>
+    </div>
+    <h1 style="font-size:32px;font-weight:800;color:#1e1b4b;">Study<span style="color:#4f46e5;">Flow</span></h1>
+    <p style="font-size:11px;font-weight:600;letter-spacing:.12em;color:#6366f1;margin-top:2px;">PLAN · FOCUS · ACHIEVE</p>
+    <p style="font-size:15px;color:#475569;margin-top:14px;line-height:1.6;max-width:300px;margin-left:auto;margin-right:auto;">Transform your academic workload into a calm, focused journey.</p>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;">
+      <div style="height:5px;width:28px;background:#4f46e5;border-radius:3px;"></div>
+      <div style="height:5px;width:20px;background:#22c55e;border-radius:3px;"></div>
+      <div style="height:5px;width:14px;background:#e2e8f0;border-radius:3px;"></div>
+    </div>
+  </div>
+  <div style="width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px;">
+    <a href="{% url 'signup' %}" class="btn btn-primary btn-block" style="font-size:16px;padding:15px;">Get Started &nbsp;→</a>
+    <a href="{% url 'login' %}"  class="btn btn-outline btn-block" style="font-size:15px;padding:14px;">Sign In</a>
+  </div>
+</div>
+</body>
+</html>
