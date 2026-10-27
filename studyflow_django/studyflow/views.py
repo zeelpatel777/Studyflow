@@ -132,12 +132,20 @@ def task_delete(request, pk):
     task.delete()
     return redirect('dashboard')
 
-
 @login_required
 def focus_mode(request):
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
-    return render(request, 'studyflow/focus.html', {'profile': profile})
 
+    timer_modes = [
+        ('Focus Duration', 'work', '#1e3a8a', '#f8faff'),
+        ('Short Break', 'short', '#22c55e', '#f0fdf4'),
+        ('Long Break', 'long', '#f59e0b', '#fffbeb'),
+    ]
+
+    return render(request, 'studyflow/focus.html', {
+        'profile': profile,
+        'timer_modes': timer_modes,
+    })
 
 @login_required
 def save_session(request):

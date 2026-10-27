@@ -67,7 +67,7 @@
       <span style="font-size:17px;font-weight:700;">⏱️ Timer Settings</span>
       <button onclick="closeSettings()" style="background:#f1f5f9;border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:14px;">✕</button>
     </div>
-    {% for label, key, color, bg in "Focus Duration,work,#1e3a8a,#f8faff|Short Break,short,#22c55e,#f0fdf4|Long Break,long,#f59e0b,#fffbeb"|split:"|" %}
+   {% for label, key, color, bg in timer_modes %}
     {% endfor %}
     <!-- Work -->
     <div style="margin-bottom:16px;">
