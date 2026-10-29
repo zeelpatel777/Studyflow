@@ -1,1 +1,1 @@
-web: gunicorn studyflow.project_urls:application
+web: gunicorn studyflow.wsgi:application
