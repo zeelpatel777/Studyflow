@@ -1,0 +1,158 @@
+{% extends 'studyflow/base.html' %}
+{% block title %}Focus Mode — StudyFlow{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Focus Mode 🎯</h1>
+    <p class="page-sub">Pomodoro timer — stay in the zone</p>
+  </div>
+  <span class="pill pill-blue" id="session-label">Session 1</span>
+</div>
+
+<div class="card" style="max-width:440px;margin:0 auto;text-align:center;">
+
+  <!-- Deep Focus Badge -->
+  <div style="display:inline-flex;align-items:center;gap:7px;background:#dcfce7;border:1.5px solid #86efac;border-radius:30px;padding:9px 18px;font-size:13px;font-weight:600;color:#166534;margin-bottom:20px;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+    Deep Focus Active
+  </div>
+
+  <!-- Mode Tabs -->
+  <div style="display:flex;background:#f1f5f9;border-radius:10px;padding:3px;gap:3px;margin-bottom:24px;">
+    <button class="mode-tab active" id="btn-work"  onclick="setMode('work')"  style="flex:1;padding:9px;border:none;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;">Work 25m</button>
+    <button class="mode-tab"        id="btn-short" onclick="setMode('short')" style="flex:1;padding:9px;border:none;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;background:transparent;color:#64748b;">Break 5m</button>
+    <button class="mode-tab"        id="btn-long"  onclick="setMode('long')"  style="flex:1;padding:9px;border:none;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;background:transparent;color:#64748b;">Long 15m</button>
+  </div>
+
+  <!-- Timer Ring -->
+  <div style="position:relative;width:200px;height:200px;margin:0 auto 24px;">
+    <svg style="transform:rotate(-90deg);" width="200" height="200" viewBox="0 0 200 200">
+      <circle fill="none" stroke="#e2e8f0" stroke-width="9" cx="100" cy="100" r="90"/>
+      <circle fill="none" stroke="#1e3a8a" stroke-width="9" stroke-linecap="round" cx="100" cy="100" r="90"
+              stroke-dasharray="565" stroke-dashoffset="0" id="timerRing" style="transition:stroke-dashoffset 1s;"/>
+    </svg>
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">
+      <div style="font-size:46px;font-weight:700;color:#0f172a;letter-spacing:-2px;line-height:1;" id="timerDisplay">25:00</div>
+      <div style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:.12em;margin-top:5px;">POMODORO</div>
+      <div style="font-size:11px;font-weight:600;color:#b45309;display:flex;align-items:center;gap:3px;justify-content:center;margin-top:3px;">🔥 {{ profile.streak }} DAY STREAK</div>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div style="display:flex;gap:16px;align-items:center;justify-content:center;margin-bottom:24px;">
+    <button onclick="resetTimer()" style="width:50px;height:50px;border-radius:50%;border:1.5px solid #e2e8f0;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.8" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+    </button>
+    <button id="playBtn" onclick="toggleTimer()" style="width:62px;height:62px;border-radius:50%;background:#1e3a8a;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(30,58,138,.35);">
+      <svg id="playIcon" width="26" height="26" viewBox="0 0 24 24" fill="#fff" stroke="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    </button>
+    <button onclick="openSettings()" style="width:50px;height:50px;border-radius:50%;border:1.5px solid #e2e8f0;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+
+  <!-- Quote -->
+  <div style="background:#eef2ff;border-left:3px solid #4f46e5;border-radius:0 10px 10px 0;padding:13px 16px;text-align:left;">
+    <p style="font-size:13px;font-style:italic;color:#1e1b4b;line-height:1.55;" id="quoteText">"Life is like riding a bicycle. To keep your balance, you must keep moving."</p>
+    <p style="font-size:11px;color:#4f46e5;font-weight:500;margin-top:6px;" id="quoteAuthor">— Albert Einstein</p>
+  </div>
+
+</div>
+
+<!-- Timer Settings Modal -->
+<div id="settingsModal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.5);z-index:100;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:20px;padding:24px;width:90%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.2);">
+    <div style="display:flex;justify-content:space-between;margin-bottom:20px;">
+      <span style="font-size:17px;font-weight:700;">⏱️ Timer Settings</span>
+      <button onclick="closeSettings()" style="background:#f1f5f9;border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:14px;">✕</button>
+    </div>
+   {% for label, key, color, bg in timer_modes %}
+    {% endfor %}
+    <!-- Work -->
+    <div style="margin-bottom:16px;">
+      <div style="font-size:12px;font-weight:600;color:#4f46e5;margin-bottom:8px;">🎯 Focus Duration</div>
+      <div style="display:flex;align-items:center;gap:12px;background:#f8faff;border-radius:12px;padding:12px 14px;">
+        <button onclick="adj('work',-5)" style="width:34px;height:34px;border-radius:50%;border:none;background:#e2e8f0;font-size:16px;font-weight:700;cursor:pointer;">−</button>
+        <div style="flex:1;text-align:center;"><div id="workVal" style="font-size:26px;font-weight:700;color:#0f172a;">25</div><div style="font-size:10px;color:#94a3b8;">minutes</div></div>
+        <button onclick="adj('work',5)"  style="width:34px;height:34px;border-radius:50%;border:none;background:#1e3a8a;color:#fff;font-size:16px;font-weight:700;cursor:pointer;">+</button>
+      </div>
+    </div>
+    <!-- Short -->
+    <div style="margin-bottom:16px;">
+      <div style="font-size:12px;font-weight:600;color:#22c55e;margin-bottom:8px;">☕ Short Break</div>
+      <div style="display:flex;align-items:center;gap:12px;background:#f0fdf4;border-radius:12px;padding:12px 14px;">
+        <button onclick="adj('short',-1)" style="width:34px;height:34px;border-radius:50%;border:none;background:#dcfce7;font-size:16px;font-weight:700;cursor:pointer;color:#166534;">−</button>
+        <div style="flex:1;text-align:center;"><div id="shortVal" style="font-size:26px;font-weight:700;color:#0f172a;">5</div><div style="font-size:10px;color:#94a3b8;">minutes</div></div>
+        <button onclick="adj('short',1)"  style="width:34px;height:34px;border-radius:50%;border:none;background:#22c55e;color:#fff;font-size:16px;font-weight:700;cursor:pointer;">+</button>
+      </div>
+    </div>
+    <!-- Long -->
+    <div style="margin-bottom:20px;">
+      <div style="font-size:12px;font-weight:600;color:#f59e0b;margin-bottom:8px;">🌙 Long Break</div>
+      <div style="display:flex;align-items:center;gap:12px;background:#fffbeb;border-radius:12px;padding:12px 14px;">
+        <button onclick="adj('long',-5)" style="width:34px;height:34px;border-radius:50%;border:none;background:#fef3c7;font-size:16px;font-weight:700;cursor:pointer;color:#92400e;">−</button>
+        <div style="flex:1;text-align:center;"><div id="longVal" style="font-size:26px;font-weight:700;color:#0f172a;">15</div><div style="font-size:10px;color:#94a3b8;">minutes</div></div>
+        <button onclick="adj('long',5)"  style="width:34px;height:34px;border-radius:50%;border:none;background:#f59e0b;color:#fff;font-size:16px;font-weight:700;cursor:pointer;">+</button>
+      </div>
+    </div>
+    <button onclick="applySettings()" style="width:100%;background:#1e3a8a;color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Apply Settings</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const QUOTES=[
+  {t:'"Life is like riding a bicycle. To keep your balance, you must keep moving."',a:'— Albert Einstein'},
+  {t:'"The secret of getting ahead is getting started."',a:'— Mark Twain'},
+  {t:'"Success is the sum of small efforts repeated day in and day out."',a:'— Robert Collier'},
+  {t:'"Believe you can and you\'re halfway there."',a:'— Theodore Roosevelt'},
+  {t:'"Focus on being productive instead of busy."',a:'— Tim Ferriss'},
+];
+let MODES={work:25*60,short:5*60,long:15*60};
+let tempM={work:25,short:5,long:15};
+let timeLeft=25*60,running=false,interval=null,curMode='work',session=1;
+
+function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
+function updateRing(){const p=timeLeft/MODES[curMode];const c=2*Math.PI*90;document.getElementById('timerRing').style.strokeDasharray=c;document.getElementById('timerRing').style.strokeDashoffset=c*(1-p);}
+
+function setMode(m){
+  clearInterval(interval);running=false;curMode=m;timeLeft=MODES[m];
+  document.getElementById('timerDisplay').textContent=fmt(timeLeft);
+  document.querySelectorAll('.mode-tab').forEach(b=>{b.style.background='transparent';b.style.color='#64748b';b.style.boxShadow='none';b.style.fontWeight='500';});
+  const ab=document.getElementById('btn-'+m);ab.style.background='#fff';ab.style.color='#0f172a';ab.style.fontWeight='600';ab.style.boxShadow='0 1px 4px rgba(0,0,0,.1)';
+  document.getElementById('playIcon').innerHTML='<polygon points="5 3 19 12 5 21 5 3"/>';
+  document.getElementById('playIcon').setAttribute('fill','#fff');
+  updateRing();
+}
+
+function toggleTimer(){
+  if(running){clearInterval(interval);running=false;document.getElementById('playIcon').innerHTML='<polygon points="5 3 19 12 5 21 5 3"/>';}
+  else{running=true;document.getElementById('playIcon').innerHTML='<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>';
+    interval=setInterval(()=>{
+      if(timeLeft<=0){clearInterval(interval);running=false;
+        if(curMode==='work'){session++;document.getElementById('session-label').textContent='Session '+session;saveSession(MODES.work/60);}
+        const q=QUOTES[Math.floor(Math.random()*QUOTES.length)];document.getElementById('quoteText').textContent=q.t;document.getElementById('quoteAuthor').textContent=q.a;
+        setMode(curMode==='work'?'short':'work');return;
+      }
+      timeLeft--;document.getElementById('timerDisplay').textContent=fmt(timeLeft);updateRing();
+    },1000);
+  }
+  document.getElementById('playIcon').setAttribute('fill','#fff');
+  document.getElementById('playIcon').setAttribute('stroke','none');
+}
+
+function resetTimer(){clearInterval(interval);running=false;timeLeft=MODES[curMode];document.getElementById('timerDisplay').textContent=fmt(timeLeft);document.getElementById('playIcon').innerHTML='<polygon points="5 3 19 12 5 21 5 3"/>';document.getElementById('playIcon').setAttribute('fill','#fff');updateRing();}
+
+function saveSession(minutes){fetch("{% url 'save_session' %}",{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':'{{ csrf_token }}'},body:JSON.stringify({minutes})});}
+
+function openSettings(){tempM={work:MODES.work/60,short:MODES.short/60,long:MODES.long/60};document.getElementById('workVal').textContent=tempM.work;document.getElementById('shortVal').textContent=tempM.short;document.getElementById('longVal').textContent=tempM.long;document.getElementById('settingsModal').style.display='flex';}
+function closeSettings(){document.getElementById('settingsModal').style.display='none';}
+function adj(t,d){const min=t==='work'?5:1,max=t==='work'?90:30;tempM[t]=Math.min(max,Math.max(min,tempM[t]+d));document.getElementById(t+'Val').textContent=tempM[t];}
+function applySettings(){MODES.work=tempM.work*60;MODES.short=tempM.short*60;MODES.long=tempM.long*60;resetTimer();closeSettings();}
+
+// Init
+setMode('work');
+</script>
+{% endblock %}
