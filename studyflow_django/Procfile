@@ -1,1 +1,0 @@
-web: gunicorn studyflow.project_urls:application
